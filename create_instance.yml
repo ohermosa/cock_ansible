@@ -1,0 +1,63 @@
+---
+
+- hosts: localhost
+  connection: local
+  vars:
+    os_keypair: keypair-1
+    os_security_group: SG_COMMON
+    os_network: 40128f87-4009-4599-a0b6-cdf237842c43
+    os_flavor: d1.medium
+    os_image: RHEL7.5
+    os_instance_name: cuchillos
+    destroy: false
+  tasks:
+    - name: "create keypair"
+      os_keypair:
+        name: "{{ os_keypair }}"
+        state: "{{ destroy | ternary('absent','present') }}"
+      register: keypair
+
+    - name: "save keypair to disk"
+      copy:
+        content: "{{ keypair.key.private_key }}"
+        dest: "{{ ansible_user_dir }}/keypair"
+        mode: 0600
+      when:
+        - keypair.changed
+        - not destroy
+
+    - name: "create instance in asgard"
+      os_server:
+        state: "{{ destroy | ternary('absent','present') }}"
+        name: "{{ os_instance_name }}"
+        image: "{{ os_image }}"
+        key_name: "{{ os_keypair }}"
+        timeout: 200
+        flavor: "{{ os_flavor }}"
+        security_groups: default
+        nics:
+          - net-id: "{{ os_network }}"
+        meta:
+          hostname: "{{ os_instance_name }}"
+          group: mis_huevos
+
+    - when: not destroy
+      block:
+        - name: "get openstack instances info"
+          os_server_info:
+          register: os_response
+
+        - name: "set instance IP"
+          set_fact:
+            my_instance_ip: "{{ item.addresses.cop_network[1].addr }}"
+          loop: "{{ os_response.openstack_servers }}"
+          loop_control:
+            label: "{{ item.addresses.cop_network[1].addr }}"
+          when: item.name == os_instance_name
+
+        - name: "check ssh connection to {{ my_instance_ip }}"
+          wait_for:
+            host: "{{ my_instance_ip }}"
+            port: 22
+            search_regex: OpenSSH
+            delay: 10
