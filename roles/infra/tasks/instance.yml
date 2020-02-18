@@ -1,0 +1,30 @@
+- name: "create instance in asgard"
+  os_server:
+    state: "{{ destroy | ternary('absent','present') }}"
+    name: "{{ os_instance_name }}"
+    image: "{{ os_image }}"
+    key_name: "{{ os_keypair }}"
+    timeout: 200
+    flavor: "{{ os_flavor }}"
+    security_groups: default
+    nics:
+      - net-id: "{{ os_network }}"
+    meta:
+      hostname: "{{ os_instance_name }}"
+      group: mis_huevos
+
+- block:
+    - name: "get openstack instances info"
+      os_server_info:
+      register: os_response
+
+    - name: "set instance IP"
+      set_fact:
+        my_instance_ip: "{{ item.addresses.cop_network[1].addr }}"
+      loop: "{{ os_response.openstack_servers }}"
+      loop_control:
+        label: "{{ item.addresses.cop_network[1].addr }}"
+      when: item.name == os_instance_name
+  when: not destroy
+  tags:
+    - check

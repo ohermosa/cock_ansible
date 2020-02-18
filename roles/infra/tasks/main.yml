@@ -1,0 +1,16 @@
+---
+
+- import_tasks: keypair.yml
+  tags:
+    - infra
+    - keypair
+
+- import_tasks: instance.yml
+  tags:
+    - infra
+    - instance
+
+- import_tasks: check.yml
+  tags:
+    - infra
+    - check

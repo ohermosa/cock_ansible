@@ -1,0 +1,9 @@
+---
+
+os_keypair: keypair-1
+os_security_group: SG_COMMON
+os_network: 40128f87-4009-4599-a0b6-cdf237842c43
+os_flavor: d1.medium
+os_image: RHEL7.5
+os_instance_name: cuchillos
+destroy: false

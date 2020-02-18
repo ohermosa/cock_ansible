@@ -1,0 +1,9 @@
+---
+
+- name: "check ssh connection to {{ my_instance_ip }}"
+  wait_for:
+    host: "{{ my_instance_ip }}"
+    port: 22
+    search_regex: OpenSSH
+    delay: 10
+  when: not destroy

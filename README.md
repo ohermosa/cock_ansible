@@ -21,5 +21,5 @@ source openstak_variables.sh
 ## 20/02/2020
 
 ```bash
-ansible-playbook create_instance.yml
+ansible-playbook create_instance.yml [-e destroy=true]
 ```

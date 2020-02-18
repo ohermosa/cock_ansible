@@ -1,0 +1,16 @@
+---
+
+- name: "create keypair"
+  os_keypair:
+    name: "{{ os_keypair }}"
+    state: "{{ destroy | ternary('absent','present') }}"
+  register: keypair
+
+- name: "save keypair to disk"
+  copy:
+    content: "{{ keypair.key.private_key }}"
+    dest: "{{ ansible_user_dir }}/keypair"
+    mode: 0600
+  when:
+    - keypair.changed
+    - not destroy
