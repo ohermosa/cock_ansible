@@ -7,6 +7,7 @@
     timeout: 200
     flavor: "{{ os_flavor }}"
     security_groups: default
+    delete_fip: true
     nics:
       - net-id: "{{ os_network }}"
     meta:
