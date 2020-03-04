@@ -22,10 +22,10 @@
     - name: "set instance IP"
       set_fact:
         my_instance_ip: "{{ item.addresses.cop_network[1].addr }}"
+      when: item.name == os_instance_name
       loop: "{{ os_response.openstack_servers }}"
       loop_control:
-        label: "{{ item.addresses.cop_network[1].addr }}"
-      when: item.name == os_instance_name
+        label: "{{ item.name }}"
   when: not destroy
   tags:
     - check

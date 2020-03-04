@@ -4,3 +4,9 @@
   connection: local
   roles:
     - infra
+  post_tasks:
+    - name: "generate static inventory"
+      template:
+        src: openstack.j2
+        dest: "inventory/openstack"
+      when: not destroy

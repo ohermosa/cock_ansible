@@ -4,13 +4,14 @@
   os_keypair:
     name: "{{ os_keypair }}"
     state: "{{ destroy | ternary('absent','present') }}"
+    public_key_file: "{{ ansible_user_dir }}/.ssh/id_rsa.pub"
   register: keypair
 
-- name: "save keypair to disk"
-  copy:
-    content: "{{ keypair.key.private_key }}"
-    dest: "{{ ansible_user_dir }}/keypair"
-    mode: 0600
-  when:
-    - keypair.changed
-    - not destroy
+# - name: "save keypair to disk"
+#   copy:
+#     content: "{{ keypair.key.private_key }}"
+#     dest: "keypair"
+#     mode: 0600
+#   when:
+#     - keypair.changed
+#     - not destroy

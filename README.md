@@ -18,8 +18,14 @@ source $WORKON_HOME/cock_ansible/bin/activate
 source openstak_variables.sh
 ```
 
-## COCK ANSIBLE 20/02/2020
+## COCK ANSIBLE 1.0 20/02/2020
 
 ```bash
 ansible-playbook create_instance.yml [-e destroy=true]
+```
+
+## COCK ANSIBLE 1.1 06/03/2020
+
+```bash
+ansible-playbook my_cock.yml
 ```
