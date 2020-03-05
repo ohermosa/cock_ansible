@@ -1,12 +1,12 @@
 ---
 
+- name: "create nginx repository file"
+  template:
+    src: nginx.repo.j2
+    dest: /etc/yum.repos.d/nginx.repo
+
 - name: "Install nginx"
   yum:
     name: nginx
+    update_cache: true
     state: present
-
-- name: "Make sure nginx service is enabled"
-  systemd:
-    name: nginx
-    enabled: yes
-    state: started

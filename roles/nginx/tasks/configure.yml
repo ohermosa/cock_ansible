@@ -3,16 +3,40 @@
 - name: "Create directories"
   file:
     state: directory
-    path: "{{ item }}"
+    path: "{{ item.path }}"
     mode: 0755
-    owner: root
-    group: root
+    owner: "{{ item.owner | default('root') }}"
+    group: "{{ item.group | default('root') }}"
   with_items:
-    - /etc/nginx/sites-enabled
-    - /etc/nginx/sites-available
+    - path: /etc/nginx/sites-enabled
+    - path: /etc/nginx/sites-available
+    - path: "{{ www_dir }}"
+      owner: "{{ nginx_user }}"
+      group: "{{ nginx_user }}"
+
+- name: "create index.html"
+  lineinfile:
+    path: "{{ www_dir }}/index.html"
+    line: "CUCHILLOS WAS HERE!"
+    state: present
+    create: true
+    owner: "{{ nginx_user }}"
+    group: "{{ nginx_user }}"
 
 - name: "Copy configuration"
-  copy:
-    src: nginx.conf
-    dest: /etc/nginx/nginx.conf
+  template:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+  loop:
+    - src: nginx.conf.j2
+      dest: /etc/nginx/nginx.conf
+    - src: cuchillos.local.j2
+      dest: /etc/nginx/sites-available/cuchillos.local
+  notify: restart nginx
+
+- name: "create link to sites-enabled"
+  file:
+    src: /etc/nginx/sites-available/cuchillos.local
+    dest: /etc/nginx/sites-enabled/cuchillos.local
+    state: link
   notify: restart nginx

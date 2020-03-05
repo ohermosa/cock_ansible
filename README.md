@@ -21,7 +21,7 @@ source openstak_variables.sh
 ## COCK ANSIBLE 1.0 20/02/2020
 
 ```bash
-ansible-playbook create_instance.yml [-e destroy=true]
+ansible-playbook infra.yml [-e destroy=true] --ask-become-pass
 ```
 
 ## COCK ANSIBLE 1.1 06/03/2020

@@ -1,17 +1,8 @@
 ---
 
-- name: "create keypair"
+- name: "{{ 'create' if not destroy else 'destroy' }} keypair"
   os_keypair:
     name: "{{ os_keypair }}"
     state: "{{ destroy | ternary('absent','present') }}"
     public_key_file: "{{ ansible_user_dir }}/.ssh/id_rsa.pub"
   register: keypair
-
-# - name: "save keypair to disk"
-#   copy:
-#     content: "{{ keypair.key.private_key }}"
-#     dest: "keypair"
-#     mode: 0600
-#   when:
-#     - keypair.changed
-#     - not destroy

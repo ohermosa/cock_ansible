@@ -1,4 +1,4 @@
-- name: "create instance in asgard"
+- name: "{{ 'create' if not destroy else 'destroy' }} instance in asgard"
   os_server:
     state: "{{ destroy | ternary('absent','present') }}"
     name: "{{ os_instance_name }}"
