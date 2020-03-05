@@ -18,5 +18,4 @@
         dest: /etc/sudoers
   roles:
     - common
-    # - ca
     - nginx
