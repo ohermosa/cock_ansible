@@ -10,3 +10,18 @@
     regexp: '^.*(cuchillos.local)$'
     line: "{{ ansible_host }}    cuchillos.local"
     state: present
+
+- name: "copy repository file"
+  copy:
+    src: default.repo
+    dest: /etc/yum.repos.d/default.repo
+
+- name: "install pip"
+  yum:
+    name: python-pip
+    update_cache: true
+    state: present
+
+- name: "install python modules"
+  pip:
+    name: pyOpenSSL==19.1.0

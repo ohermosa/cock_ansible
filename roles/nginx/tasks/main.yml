@@ -5,10 +5,10 @@
     - nginx
     - install
 
-# - import_tasks: ssl.yml
-#   tags:
-#     - nginx
-#     - ssl
+- import_tasks: ssl.yml
+  tags:
+    - nginx
+    - ssl
 
 - import_tasks: configure.yml
   tags:

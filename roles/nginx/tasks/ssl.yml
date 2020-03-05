@@ -8,100 +8,15 @@
     owner: root
     group: root
 
-- name: "create vault directory"
-  file:
-    path: "{{ item }}"
-    state: directory
-    owner: 100
-    group: 1000
-    recurse: true
-  loop:
-    - "{{ vault_dir }}"
-    - "{{ vault_dir }}/ssl"
-
-- name: "Create {{ local_vault_certs }} in localhost"
-  file:
-    path: "{{ local_vault_certs }}"
-    state: directory
-  delegate_to: localhost
-  become: false
-
-- name: "Generate {{ service.short_name }} rsa private key"
-  openssl_privatekey:
-    path: "{{ local_vault_certs }}/{{ service.short_name }}.key"
-  delegate_to: localhost
-  become: false
-
-- name: "Generate {{ rootca_common_name }} csr"
-  openssl_csr:
-    path: "{{ local_vault_certs }}/{{ service.short_name }}.csr"
-    privatekey_path: "{{ local_vault_certs }}/{{ service.short_name }}.key"
-    common_name: "{{ service.extra_san }}"
-    basic_constraints:
-      - "CA:FALSE"
-    basic_constraints_critical: true
-    key_usage:
-      - digitalSignature
-      - keyEncipherment
-      - dataEncipherment
-    key_usage_critical: true
-    extended_key_usage:
-      - serverAuth
-  delegate_to: localhost
-  become: false
-
-- name: "Generate an OpenSSL certificate signed with our own CA certificate"
-  openssl_certificate:
-    path: "{{ local_vault_certs }}/{{ service.short_name }}.crt"
-    csr_path: "{{ local_vault_certs }}/{{ service.short_name }}.csr"
-    ownca_path: "{{ intermediate_crt }}"
-    ownca_privatekey_path: "{{ intermediate_key }}"
-    provider: ownca
-  delegate_to: localhost
-  become: false
-
-- name: "Check if {{ local_vault_certs }}/{{ service.short_name }}.pem exists"
-  stat:
-    path: "{{ local_vault_certs }}/{{ service.short_name }}.pem"
-  register: vaultpem
-  delegate_to: localhost
-  become: false
-
-- name: "Delete {{ local_vault_certs }}/{{ service.short_name }}.pem if exists"
-  file:
-    path: "{{ local_vault_certs }}/{{ service.short_name }}.pem"
-    state: absent
-  when: vaultpem.stat.exists
-  delegate_to: localhost
-  become: false
-
-- name: "Generate Vault PEM"
-  lineinfile:
-    path: "{{ local_vault_certs }}/{{ service.short_name }}.pem"
-    create: true
-    line: "{{ item }}"
-  loop:
-    - "{{ lookup('file', '{{ local_vault_certs }}/{{ service.short_name }}.crt') }}"
-    - "{{ lookup('file', '{{ intermediate_crt }}') }}"
-    - "{{ lookup('file', '{{ rootca_crt }}') }}"
-  delegate_to: localhost
-  become: false
-
-- name: "copy vault certs to molecule instance"
+- name: "copy CA"
   copy:
-    src: "{{ item }}"
-    dest: "{{ vault_dir }}/ssl/"
-  loop:
-    - "{{ local_vault_certs }}/{{ service.short_name }}.crt"
-    - "{{ local_vault_certs }}/{{ service.short_name }}.pem"
-    - "{{ local_vault_certs }}/{{ service.short_name }}.key"
+    src: root_ca
+    dest: /root
 
-- name: "change certificates permissions"
-  file:
-    path: "{{ vault_dir }}/ssl/{{ item }}"
-    mode: 0600
-    owner: 100
-    group: 1000
-  loop:
-    - "{{ service.short_name }}.pem"
-    - "{{ service.short_name }}.key"
+- name: "Generate an OpenSSL certificate signed with your own CA certificate"
+  openssl_certificate:
+    path: /etc/nginx/ssl/{{ domain_name }}.crt
+    csr_path: /etc/nginx/ssl/{{ domain_name }}.csr
+    ownca_path: /root/root_ca/ca.crt
+    ownca_privatekey_path: /root/root_ca/ca.key
+    provider: ownca
