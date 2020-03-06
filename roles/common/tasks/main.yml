@@ -1,27 +1,16 @@
 ---
 
-- name: "set hostname"
-  hostname:
-    name: "{{ inventory_hostname }}"
+- import_tasks: hostname.yml
+  tags:
+    - common
+    - hostname
 
-- name: "set /etc/hosts"
-  lineinfile:
-    path: /etc/hosts
-    regexp: '^.*(cuchillos.local)$'
-    line: "{{ ansible_host }}    cuchillos.local"
-    state: present
+- import_tasks: update.yml
+  tags:
+    - common
+    - hostname
 
-- name: "copy repository file"
-  copy:
-    src: default.repo
-    dest: /etc/yum.repos.d/default.repo
-
-- name: "install pip"
-  yum:
-    name: python-pip
-    update_cache: true
-    state: present
-
-- name: "install python modules"
-  pip:
-    name: pyOpenSSL==19.1.0
+- import_tasks: python.yml
+  tags:
+    - common
+    - python

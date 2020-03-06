@@ -1,0 +1,11 @@
+---
+
+- name: "install python packages"
+  yum:
+    name: "{{ item }}"
+    state: present
+  loop: "{{ python_packages }}"
+
+- name: "install python modules"
+  pip:
+    name: pyOpenSSL==19.1.0

@@ -1,0 +1,12 @@
+---
+
+- name: "set hostname"
+  hostname:
+    name: "{{ inventory_hostname }}"
+
+- name: "set /etc/hosts"
+  lineinfile:
+    path: /etc/hosts
+    regexp: '^.*(cuchillos.local)$'
+    line: "{{ ansible_host }}    cuchillos.local"
+    state: present
