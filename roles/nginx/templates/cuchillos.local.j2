@@ -6,7 +6,28 @@ server {
    access_log /var/log/nginx/{{ domain_name }}_access.log;
    error_log /var/log/nginx/{{ domain_name }}_error.log;
 
-  #  return 301 https://$host$request_uri;
+  return 301 https://$host$request_uri;
+}
+
+
+server {
+   listen 0.0.0.0:{{ https_port }} ssl;
+
+   server_name {{ domain_name }};
+
+   access_log /var/log/nginx/ssl.{{ domain_name }}_access.log;
+   error_log /var/log/nginx/ssl.{{ domain_name }}_error.log;
+
+   ssl on;
+
+   ssl_certificate  /etc/nginx/ssl/{{ domain_name }}.crt;
+   ssl_certificate_key  /etc/nginx/ssl/{{ domain_name }}.key;
+
+   ssl_session_timeout 5m;
+
+   ssl_protocols SSLv3 TLSv1 TLSv1.1 TLSv1.2;
+   ssl_ciphers "HIGH:!aNULL:!MD5 or HIGH:!aNULL:!MD5:!3DES";
+   ssl_prefer_server_ciphers on;
 
   root /var/www/html/{{ domain_name }};
   index index.php index.html index.htm;
@@ -15,26 +36,3 @@ server {
       try_files $uri $uri/ /index.php?q=$uri&$args;
    }
 }
-
-
-# server {
-#    listen 0.0.0.0:{{ https_port }} ssl;
-
-#    server_name {{ domain_name }};
-
-#    access_log /var/log/nginx/ssl.{{ domain_name }}_access.log;
-#    error_log /var/log/nginx/ssl.{{ domain_name }}_error.log;
-
-#    ssl on;
-
-#    ssl_certificate /etc/letsencrypt/live/{{ domain_name }}/fullchain.pem;
-#    ssl_certificate_key /etc/letsencrypt/live/{{ domain_name }}/privkey.pem;
-
-#    ssl_session_timeout 5m;
-
-#    ssl_protocols SSLv3 TLSv1 TLSv1.1 TLSv1.2;
-#    ssl_ciphers "HIGH:!aNULL:!MD5 or HIGH:!aNULL:!MD5:!3DES";
-#    ssl_prefer_server_ciphers on;
-
-#    return 301 https://www.lexdefensa.es;
-# }

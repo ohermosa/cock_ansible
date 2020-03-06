@@ -1,3 +1,2 @@
 roles/nginx/files/root_ca/*key
-roles/nginx/files/root_ca/*csr
 
