@@ -1,0 +1,17 @@
+---
+
+- name: "install python dependencies"
+  pip:
+    name: "{{ python_packages }}"
+
+- name: "install mariadb"
+  yum:
+    name:
+      - mariadb-server
+    state: latest
+
+- name: "enable and start mariadb"
+  systemd:
+    name: mariadb
+    enabled: true
+    state: started

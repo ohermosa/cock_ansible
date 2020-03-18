@@ -1,0 +1,67 @@
+---
+
+# https://docs.gitea.io/en-us/install-from-binary/
+
+- name: "create gitea group"
+  group:
+    name: "{{ gitea_group }}"
+    state: present
+
+- name: "create gitea user"
+  user:
+    name: "{{ gitea_user }}"
+    state: present
+    shell: /bin/bash
+    system: true
+    password_lock: true
+    home: "/home/{{ gitea_user }}"
+    group: "{{ gitea_group }}"
+
+- name: "create gitea directories"
+  file:
+    path: "{{ item.path }}"
+    state: directory
+    mode: "{{ item.mode }}"
+    owner: "{{ item.owner }}"
+    group: "{{ item.group }}"
+    recurse: true
+  loop:
+    - path: "/var/lib/{{ gitea_service }}"
+      mode: "0750"
+      owner: "{{ gitea_user }}"
+      group: "{{ gitea_group }}"
+    - path: "/var/lib/{{ gitea_service }}/custom"
+      mode: "0750"
+      owner: "{{ gitea_user }}"
+      group: "{{ gitea_group }}"
+    - path: "/var/lib/{{ gitea_service }}/data"
+      mode: "0750"
+      owner: "{{ gitea_user }}"
+      group: "{{ gitea_group }}"
+    - path: "/var/lib/{{ gitea_service }}/log"
+      mode: "0750"
+      owner: "{{ gitea_user }}"
+      group: "{{ gitea_group }}"
+    - path: "/etc/{{ gitea_service }}"
+      mode: "750"
+      owner: root
+      group: "{{ gitea_group }}"
+    # - path: "/home/{{ gitea_user }}/{{ gitea_service }}/log/supervisor"
+    #   mode: 755
+    #   owner: "{{ gitea_user }}"
+    #   group: "{{ gitea_group }}"
+
+- name: "copy gitea systemd unit"
+  template:
+    src: systemd-unit.j2
+    dest: "/etc/systemd/system/{{ gitea_service }}.service"
+  notify: reload daemon
+
+- name: "configure gitea"
+  template:
+    src: app.ini.j2
+    dest: "/etc/{{ gitea_service }}/app.ini"
+    mode: 0640
+    owner: root
+    group: "{{ gitea_group }}"
+  notify: restart gitea

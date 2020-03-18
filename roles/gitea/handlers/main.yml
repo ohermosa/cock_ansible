@@ -1,0 +1,25 @@
+---
+
+- name: "reload daemon"
+  systemd:
+    name: "{{ gitea_service }}"
+
+- name: "restart gitea"
+  systemd:
+    name: "{{ gitea_service }}"
+    state: restarted
+    enabled: true
+  listen: restart gitea
+
+- name: "check gitea connection"
+  wait_for:
+    host: localhost
+    port: "{{ gitea_port }}"
+    delay: 10
+  listen: restart gitea
+
+- name: "restart nginx for gitea"
+  systemd:
+    name: nginx
+    state: restarted
+    enabled: true

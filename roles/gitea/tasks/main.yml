@@ -1,0 +1,21 @@
+---
+
+- import_tasks: database.yml
+  tags:
+    - gitea
+    - gitea_database
+
+- import_tasks: install.yml
+  tags:
+    - gitea
+    - gitea_install
+
+- import_tasks: configure.yml
+  tags:
+    - gitea
+    - gitea_configure
+
+- import_tasks: nginx.yml
+  tags:
+    - gitea
+    - gitea_nginx

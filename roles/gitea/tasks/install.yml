@@ -1,0 +1,32 @@
+---
+
+- name: "install dependencies"
+  yum:
+    name:
+      # - supervisor
+      - git
+    state: present
+    update_cache: true
+
+- name: "get the latest gitea version"
+  gitea_get_latest:
+  register: gitea_response
+
+- set_fact:
+    gitea_version: "{{ gitea_response.version }}"
+
+- name: "check if gitea is already downloaded"
+  stat:
+    path: /usr/local/bin/gitea
+  register: stat_response
+
+- name: "delete binary if exits"
+  file:
+    path: /usr/local/bin/gitea
+    state: absent
+
+- name: "download gitea binary"
+  get_url:
+    url: "{{ gitea_package }}"
+    dest: /usr/local/bin/gitea
+    mode: 0755

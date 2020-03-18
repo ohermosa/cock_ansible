@@ -1,0 +1,42 @@
+---
+
+- name: "check if ssl directory exists"
+  stat:
+    path: "/etc/nginx/ssl"
+  register: ssl_response
+
+- import_role:
+    name: nginx
+    tasks_from: ssl.yml
+  when: not ssl_response.stat.exists
+
+- name: "Generate a private key for {{ gitea_domain }}"
+  openssl_privatekey:
+    path: /etc/nginx/ssl/{{ gitea_domain }}.key
+
+- name: "Generate a CSR for {{ gitea_domain }}"
+  openssl_csr:
+    path: /etc/nginx/ssl/{{ gitea_domain }}.csr
+    privatekey_path: /etc/nginx/ssl/{{ gitea_domain }}.key
+    common_name: "{{ gitea_domain }}"
+
+- name: "Generate a CRT for {{ gitea_domain }}"
+  openssl_certificate:
+    path: /etc/nginx/ssl/{{ gitea_domain }}.crt
+    csr_path: /etc/nginx/ssl/{{ gitea_domain }}.csr
+    ownca_path: /root/root_ca/ca.crt
+    ownca_privatekey_path: /root/root_ca/ca.key
+    provider: ownca
+
+- name: "generate config for nginx"
+  template:
+    src: gitea.cuchillos.local.j2
+    dest: "/etc/nginx/sites-available/{{ gitea_domain }}"
+  notify: restart nginx for gitea
+
+- name: "create link"
+  file:
+    src: "/etc/nginx/sites-available/{{ gitea_domain }}"
+    dest: "/etc/nginx/sites-enabled/{{ gitea_domain }}"
+    state: link
+  notify: restart nginx for gitea

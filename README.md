@@ -21,11 +21,20 @@ source openstak_variables.sh
 ## COCK ANSIBLE 1.0 20/02/2020
 
 ```bash
+git checkout tags/1.0
 ansible-playbook infra.yml [-e destroy=true] --ask-become-pass
 ```
 
 ## COCK ANSIBLE 1.1 06/03/2020
 
 ```bash
+git checkout tags/1.1
 ansible-playbook my_cock.yml
+```
+
+## COCK ANSIBLE 1.2 27/03/2020
+
+```bash
+git checkout tags/1.2
+ansible-playbook my_cock.yml --ask-vault-pass
 ```

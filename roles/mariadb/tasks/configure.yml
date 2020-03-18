@@ -1,0 +1,15 @@
+---
+
+- name: "check mysql connection"
+  wait_for:
+    host: localhost
+    port: 3306
+    delay: 10
+
+- name: "set root password"
+  mysql_user:
+    user: root
+    check_implicit_admin: true
+    password: "{{ mariadb_root_password }}"
+    host: localhost
+  ignore_errors: true

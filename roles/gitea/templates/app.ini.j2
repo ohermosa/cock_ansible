@@ -1,0 +1,67 @@
+APP_NAME = {{ gitea_domain }}
+RUN_USER = {{ gitea_user }}
+RUN_MODE = prod
+
+[oauth2]
+JWT_SECRET = L_yZSu0a9hY54lWj9ZdPdeXmLSvEN09rVYTCRrJ9E9M
+
+[security]
+INTERNAL_TOKEN = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYmYiOjE1ODQ1NDEyNjR9.XgK775EW32R_trpy81Z4ZvoS6GXc_Q-nW4vLvz8ElMA
+INSTALL_LOCK   = true
+SECRET_KEY     = a3ncuXzxmkkhxXPuOf7Xt2FWByae6ddSbWT2y5pTbwvWCRN8Mh5y6Ks2SJuRSAj4
+
+[database]
+DB_TYPE  = mysql
+HOST     = 127.0.0.1:3306
+NAME     = {{ gitea_database }}
+USER     = {{ gitea_db_user }}
+PASSWD   = `{{ gitea_db_pass }}`
+SSL_MODE = disable
+CHARSET  = utf8
+PATH     = /usr/local/bin/data/gitea.db
+
+[repository]
+ROOT = /var/lib/{{ gitea_service }}/data
+
+[server]
+SSH_DOMAIN       = {{ gitea_domain }}
+DOMAIN           = {{ gitea_domain }}
+HTTP_PORT        = {{ gitea_port }}
+ROOT_URL         = https://{{ gitea_domain }}/
+DISABLE_SSH      = false
+SSH_PORT         = 22
+{# LFS_START_SERVER = true
+LFS_CONTENT_PATH = /usr/local/bin/data/lfs
+LFS_JWT_SECRET   = XDYbjVAEXgEwXoespnxQbNInFrijBKSyUPrEhtlC9dw #}
+OFFLINE_MODE     = false
+
+[mailer]
+ENABLED = false
+
+[service]
+REGISTER_EMAIL_CONFIRM            = false
+ENABLE_NOTIFY_MAIL                = false
+DISABLE_REGISTRATION              = false
+ALLOW_ONLY_EXTERNAL_REGISTRATION  = false
+ENABLE_CAPTCHA                    = false
+REQUIRE_SIGNIN_VIEW               = false
+DEFAULT_KEEP_EMAIL_PRIVATE        = false
+DEFAULT_ALLOW_CREATE_ORGANIZATION = true
+DEFAULT_ENABLE_TIMETRACKING       = true
+NO_REPLY_ADDRESS                  = noreply.localhost
+
+[picture]
+DISABLE_GRAVATAR        = false
+ENABLE_FEDERATED_AVATAR = true
+
+[openid]
+ENABLE_OPENID_SIGNIN = true
+ENABLE_OPENID_SIGNUP = true
+
+[session]
+PROVIDER = file
+
+[log]
+MODE      = file
+LEVEL     = info
+ROOT_PATH = /var/lib/{{ gitea_service }}/log

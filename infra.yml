@@ -6,17 +6,31 @@
     - infra
   post_tasks:
     - block:
-        - name: "create entry in /etc/hosts"
+        - name: "create entries in /etc/hosts"
           become: true
           become_method: sudo
           lineinfile:
             path: /etc/hosts
-            regexp: '^.*(cuchillos.local)$'
-            line: "{{ hostvars['localhost']['my_instance_ip'] }}    cuchillos.local"
+            regexp: "{{ item.regexp }}"
+            line: "{{ item.line }}"
             state: present
+          loop:
+            - regexp: '^.*( cuchillos.local)$'
+              line: "{{ hostvars['localhost']['my_instance_ip'] }}    cuchillos.local"
+            - regexp: '^.*(gitea.cuchillos.local)$'
+              line: "{{ hostvars['localhost']['my_instance_ip'] }}    gitea.cuchillos.local"
 
         - name: "generate static inventory"
           template:
             src: openstack.j2
             dest: "inventory/openstack"
       when: not destroy
+
+    - name: "delete entries in /etc/hosts"
+      become: true
+      become_method: sudo
+      lineinfile:
+        path: /etc/hosts
+        regexp: '^.*(cuchillos.local)$'
+        state: absent
+      when: destroy|bool

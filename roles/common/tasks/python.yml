@@ -8,4 +8,7 @@
 
 - name: "install python modules"
   pip:
-    name: pyOpenSSL==19.1.0
+    name:
+      - pyOpenSSL==19.1.0
+      - bs4
+      - packaging

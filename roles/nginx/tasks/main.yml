@@ -3,14 +3,19 @@
 - import_tasks: install.yml
   tags:
     - nginx
-    - install
+    - nginx_install
 
 - import_tasks: ssl.yml
   tags:
     - nginx
-    - ssl
+    - nginx_ssl
+
+- import_tasks: certificate.yml
+  tags:
+    - nginx
+    - nginx_certificate
 
 - import_tasks: configure.yml
   tags:
     - nginx
-    - configure
+    - nginx_configure

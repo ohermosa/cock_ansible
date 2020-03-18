@@ -1,0 +1,18 @@
+---
+
+
+- name: "create database for {{ gitea_service }}"
+  mysql_db:
+    name: "{{ gitea_database }}"
+    state: present
+    login_user: root
+    login_password: "{{ mariadb_root_password }}"
+
+- name: "create user for {{ gitea_service }}"
+  mysql_user:
+    name: "{{ gitea_db_user }}"
+    password: "{{ gitea_db_pass }}"
+    login_user: root
+    login_password: "{{ mariadb_root_password }}"
+    priv: "{{ gitea_database }}.*:ALL"
+    state: present

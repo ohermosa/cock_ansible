@@ -1,8 +1,6 @@
 ---
 
 domain_name: cuchillos.local
-http_port: 80
-https_port: 443
 www_dir: "/var/www/html/{{ domain_name }}"
 
 nginx_user: nginx

@@ -1,0 +1,18 @@
+[Unit]
+Description=Gitea
+After=syslog.target
+After=network.target
+After=mariadb.service
+
+[Service]
+RestartSec=2s
+Type=simple
+User={{ gitea_user }}
+Group={{ gitea_group }}
+WorkingDirectory=/var/lib/{{ gitea_service }}
+ExecStart=/usr/local/bin/{{ gitea_service }} web -c /etc/{{ gitea_service }}/app.ini --work-path /var/lib/{{ gitea_service }} --custom-path /var/lib/{{ gitea_service }}/custom
+Restart=always
+Environment=USER=root HOME=/home/{{ gitea_user }} GITEA_WORK_DIR=/var/lib/{{ gitea_service }} PATH=/usr/local/bin:/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/home/git/.local/bin:/home/git/bin
+
+[Install]
+WantedBy=multi-user.target

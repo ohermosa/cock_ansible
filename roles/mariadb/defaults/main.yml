@@ -1,0 +1,8 @@
+---
+
+python_packages:
+  - pymysql
+
+mariadb_packages:
+  - MySQL-python
+  - mariadb-server
