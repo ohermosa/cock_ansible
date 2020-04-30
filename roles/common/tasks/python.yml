@@ -1,8 +1,14 @@
 ---
 
+- name: "copy pip packages"
+  copy:
+    src: "{{ item }}"
+    dest: "/tmp/{{ item }}"
+  loop: "{{ python_packages }}"
+
 - name: "install python packages"
   yum:
-    name: "{{ item }}"
+    name: "/tmp/{{ item }}"
     state: present
   loop: "{{ python_packages }}"
 
@@ -12,3 +18,9 @@
       - pyOpenSSL==19.1.0
       - bs4
       - packaging
+
+- name: "delete temporal files"
+  file:
+    path: "/tmp/{{ item }}"
+    state: absent
+  loop: "{{ python_packages }}"

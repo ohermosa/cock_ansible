@@ -61,8 +61,8 @@ def get_latest():
     if gitea_text.status_code == 200:
         soup = BeautifulSoup(gitea_text.text, "html.parser")
         versions = []
-        for item in soup.findAll("td", class_="name"):
-            versions.append(item.a.text.strip().rstrip())
+        for item in soup.findAll("span", class_="name"):
+            versions.append(item.text)
         if len(versions) == 0:
             return None
         else:

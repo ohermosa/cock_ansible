@@ -1,2 +1,2 @@
 roles/nginx/files/root_ca/*key
-
+inventory/openstack

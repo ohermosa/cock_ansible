@@ -6,5 +6,5 @@ rhel_packages:
   - wget
 
 python_packages:
-  - ftp://ftp.pbone.net/mirror/ftp.centos.org/7.7.1908/cloud/x86_64/openstack-stein/python2-setuptools-40.8.0-1.el7.noarch.rpm
-  - ftp://ftp.pbone.net/mirror/ftp5.gwdg.de/pub/opensuse/repositories/home:/lenovo-lico:/lico-dep:/Factory:/el7/el7/noarch/python2-pip-9.0.3-1.6.el7.noarch.rpm
+  - python2-pip-9.0.3-1.6.el7.noarch.rpm
+  - python2-setuptools-40.8.0-1.el7.noarch.rpm
