@@ -4,6 +4,8 @@ rhel_packages:
   - vim
   - curl
   - wget
+  - zip
+  - unzip
 
 python_packages:
   - python2-pip-9.0.3-1.6.el7.noarch.rpm

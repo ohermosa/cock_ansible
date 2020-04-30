@@ -16,3 +16,5 @@
     name: "{{ rhel_packages }}"
     state: present
     update_cache: true
+  tags:
+    - install_packages

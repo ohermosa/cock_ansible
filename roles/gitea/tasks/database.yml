@@ -1,5 +1,8 @@
 ---
 
+- name: "import secrets file"
+  include_vars:
+    file: secrets.yml
 
 - name: "create database for {{ gitea_service }}"
   mysql_db:
