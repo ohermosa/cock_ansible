@@ -38,3 +38,14 @@ ansible-playbook my_cock.yml
 git checkout tags/1.2
 ansible-playbook my_cock.yml --ask-vault-pass
 ```
+
+## COCK ANSIBLE 1.3
+
+```bash
+git checkout tags/1.3
+
+ansible-playbook backup.yml --ask-vault-pass
+ansible-playbook restore.yml --ask-vault-pass
+
+ansible-playbook update_gitea.yml --ask-vault-pass
+```

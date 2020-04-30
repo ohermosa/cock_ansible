@@ -1,0 +1,29 @@
+---
+
+- hosts:
+    - all
+  become: yes
+  become_user: root
+  vars:
+    gitea_user: gitea
+    gitea_service: gitea
+  tasks:
+    - name: "Execute gitea dump"
+      become: true
+      become_user: "{{ gitea_user }}"
+      shell: "/usr/local/bin/gitea dump -c /etc/{{ gitea_service }}/app.ini"
+
+    - name: "Find backup file"
+      find:
+        paths: "/home/{{ gitea_user }}"
+        patterns: '*.zip'
+      register: find_response
+
+    - set_fact:
+        latest_backup: "{{ (find_response.files | sort(attribute='mtime',reverse=true) | first).path }}"
+
+    - name: "download backup"
+      fetch:
+        src: "{{ latest_backup }}"
+        dest: "/tmp/{{ latest_backup | basename }}"
+        flat: true
