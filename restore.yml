@@ -1,0 +1,100 @@
+---
+
+- hosts:
+    - all
+  become: yes
+  become_user: root
+  vars:
+    gitea_user: gitea
+    gitea_group: gitea
+    gitea_service: gitea
+    gitea_database: "{{ gitea_service }}_db"
+    gitea_db_user: gitea
+  handlers:
+    - name: "restart gitea"
+      systemd:
+        name: "{{ gitea_service }}"
+        state: restarted
+        enabled: true
+      listen: restart gitea
+
+    - name: "check gitea connection"
+      wait_for:
+        host: localhost
+        port: "{{ gitea_port }}"
+        delay: 10
+      listen: restart gitea
+
+    - name: "restart nginx for gitea"
+      systemd:
+        name: nginx
+        state: restarted
+        enabled: true
+  tasks:
+    - name: "check that 'backup_file' is defined"
+      assert:
+        that:
+          - backup_file is defined
+        fail_msg: "'backup_file' with path to backup file must be defined with extra-vars"
+
+    - name: "stop gitea service"
+      systemd:
+        name: "{{ gitea_service }}"
+        state: stopped
+
+    - name: "include secrets"
+      include_vars:
+        file: roles/gitea/vars/secrets.yml
+
+    - name: "delete {{ gitea_service }} database"
+      mysql_db:
+        login_user: "{{ gitea_db_user }}"
+        login_password: "{{ gitea_db_pass }}"
+        state: absent
+        name: "{{ gitea_database }}"
+
+    - name: "upload backup to remote"
+      unarchive:
+        src: "{{ backup_file }}"
+        dest: "/tmp"
+
+    - name: "restore app.ini"
+      copy:
+        src: "/tmp/app.ini"
+        dest: "/etc/{{ gitea_service }}/app.ini"
+        remote_src: true
+        mode: 0640
+        owner: root
+        group: "{{ gitea_group }}"
+      notify: restart gitea
+
+    - name: "unzip gitea-repo.zip"
+      unarchive:
+        src: /tmp/gitea-repo.zip
+        dest: "/var/lib/{{ gitea_service }}"
+        remote_src: true
+        mode: "0750"
+        owner: "{{ gitea_user }}"
+        group: "{{ gitea_group }}"
+
+    - name: "import database dump"
+      mysql_db:
+        login_user: "{{ gitea_db_user }}"
+        login_password: "{{ gitea_db_pass }}"
+        state: import
+        name: "{{ gitea_database }}"
+        target: /tmp/gitea-db.sql
+      notify: restart gitea
+
+    - name: "create gitea certs"
+      import_role:
+          name: gitea
+          tasks_from: nginx.yml
+      notify: restart nginx for gitea
+
+    - name: "Regenerate hooks"
+      become: true
+      become_user: "{{ gitea_user }}"
+      shell: "/usr/local/bin/gitea admin regenerate hooks -c /etc/{{ gitea_service }}/app.ini "
+      args:
+        chdir: "/home/{{ gitea_user }}"

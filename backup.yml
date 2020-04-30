@@ -12,6 +12,8 @@
       become: true
       become_user: "{{ gitea_user }}"
       shell: "/usr/local/bin/gitea dump -c /etc/{{ gitea_service }}/app.ini"
+      args:
+        chdir: "/home/{{ gitea_user }}"
 
     - name: "Find backup file"
       find:
@@ -27,3 +29,6 @@
         src: "{{ latest_backup }}"
         dest: "/tmp/{{ latest_backup | basename }}"
         flat: true
+
+    - debug:
+        msg: "backup stored in '/tmp/{{ latest_backup | basename }}'"
