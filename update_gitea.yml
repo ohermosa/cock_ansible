@@ -4,12 +4,38 @@
     - all
   become: yes
   become_user: root
+  vars:
+    gitea_user: gitea
+    gitea_group: gitea
+    gitea_service: gitea
   tasks:
+    - name: "get current gitea version"
+      shell: "/usr/local/bin/gitea -version | awk '{  print $3 }'"
+      register: gitea_response
+      changed_when: false
 
+    - name: "get the latest gitea version"
+      gitea_get_latest:
+      register: web_response
 
-    Updating to a new version
-You can update to a new version of Gitea by stopping Gitea, replacing the binary at /usr/local/bin/gitea and restarting the instance. The binary file name should not be changed during the update to avoid problems in existing repositories.
+    - name: "set current gitea version and latest available version"
+      set_fact:
+        gitea_current_version: "{{ gitea_response.stdout }}"
+        gitea_available_version: "{{ web_response.version }}"
 
-It is recommended you do a backup before updating your installation.
+    - name: "update gitea"
+      block:
+        - name: "stop gitea service"
+          systemd:
+            name: gitea
+            state: stopped
 
-If you have carried out the installation steps as described above, the binary should have the generic name gitea. Do not change this, i.e. to include the version number.
+        - import_role:
+            name: gitea
+            tasks_from: install.yml
+
+        - name: "start gitea service"
+          systemd:
+            name: gitea
+            state: started
+      when: gitea_current_version != gitea_available_version

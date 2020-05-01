@@ -11,6 +11,7 @@
 - name: "get the latest gitea version"
   gitea_get_latest:
   register: gitea_response
+  changed_when: false
 
 - set_fact:
     gitea_version: "{{ gitea_response.version }}"

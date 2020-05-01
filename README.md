@@ -86,5 +86,5 @@ git checkout tags/1.3
 ansible-playbook backup.yml
 ansible-playbook restore.yml  -e backup_file=/tmp/gitea-dump-1234.zip --ask-vault-path
 
-ansible-playbook update_gitea.yml --ask-vault-pass
+ansible-playbook update_gitea.yml
 ```
