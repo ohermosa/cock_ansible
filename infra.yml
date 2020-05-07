@@ -2,10 +2,21 @@
 
 - hosts: localhost
   connection: local
-  roles:
-    - infra
-  post_tasks:
+  vars:
+    destroy: false
+    refresh_inventory: false
+  tasks:
+    - include_role:
+        name: infra
+      when: not refresh_inventory
+
     - block:
+        - name: "get server ip if refresh_intentory is true"
+          include_role:
+            name: infra
+            tasks_from: get_ip.yml
+          when: refresh_inventory | bool
+
         - name: "create entries in /etc/hosts"
           become: true
           become_method: sudo
@@ -19,12 +30,14 @@
               line: "{{ hostvars['localhost']['my_instance_ip'] }}    cuchillos.local"
             - regexp: '^.*(gitea.cuchillos.local)$'
               line: "{{ hostvars['localhost']['my_instance_ip'] }}    gitea.cuchillos.local"
+            - regexp: '^.*(netdata.cuchillos.local)$'
+              line: "{{ hostvars['localhost']['my_instance_ip'] }}    netdata.cuchillos.local"
 
         - name: "generate static inventory"
           template:
             src: openstack.j2
             dest: "inventory/openstack"
-      when: not destroy
+      when: not (destroy | bool) or (refresh_inventory | bool)
 
     - name: "delete entries in /etc/hosts"
       become: true
@@ -33,4 +46,6 @@
         path: /etc/hosts
         regexp: '^.*(cuchillos.local)$'
         state: absent
-      when: destroy|bool
+      when:
+        - destroy | bool
+        - not refresh_inventory

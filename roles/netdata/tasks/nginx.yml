@@ -1,0 +1,52 @@
+---
+
+- name: "check if ssl directory exists"
+  stat:
+    path: "/etc/nginx/ssl"
+  register: ssl_response
+
+- import_role:
+    name: nginx
+    tasks_from: ssl.yml
+  when: not ssl_response.stat.exists
+
+- name: "Generate a private key for {{ netdata_domain }}"
+  openssl_privatekey:
+    path: /etc/nginx/ssl/{{ netdata_domain }}.key
+
+- name: "Generate a CSR for {{ netdata_domain }}"
+  openssl_csr:
+    path: /etc/nginx/ssl/{{ netdata_domain }}.csr
+    privatekey_path: /etc/nginx/ssl/{{ netdata_domain }}.key
+    common_name: "{{ netdata_domain }}"
+
+- name: "Generate a CRT for {{ netdata_domain }}"
+  openssl_certificate:
+    path: /etc/nginx/ssl/{{ netdata_domain }}.crt
+    csr_path: /etc/nginx/ssl/{{ netdata_domain }}.csr
+    ownca_path: /root/root_ca/ca.crt
+    ownca_privatekey_path: /root/root_ca/ca.key
+    provider: ownca
+
+- name: "generate config for nginx"
+  template:
+    src: netdata.cuchillos.local.j2
+    dest: "/etc/nginx/sites-available/{{ netdata_domain }}"
+  notify: restart nginx for netdata
+
+- name: configure basic authentication
+  htpasswd:
+    path: /etc/nginx/passwords
+    name: ohermosa
+    password: '{{ netdata_password }}'
+    owner: root
+    group: nginx
+    mode: 0640
+  notify: restart nginx for netdata
+
+- name: "create link"
+  file:
+    src: "/etc/nginx/sites-available/{{ netdata_domain }}"
+    dest: "/etc/nginx/sites-enabled/{{ netdata_domain }}"
+    state: link
+  notify: restart nginx for netdata

@@ -1,9 +1,5 @@
 ---
 
-#######
-# All #
-#######
-
 - hosts:
     - all
   become: yes
@@ -21,3 +17,4 @@
     - nginx
     - mariadb
     - gitea
+    - netdata

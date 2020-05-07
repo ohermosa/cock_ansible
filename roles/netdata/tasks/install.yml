@@ -1,0 +1,29 @@
+---
+
+- name: "create netdata install directory"
+  file:
+    path: '{{ netdata_install_dir }}'
+    state: directory
+
+- name: "git clone netdata"
+  git:
+    repo: '{{ netdata_repo }}'
+    dest: '{{ netdata_install_dir }}'
+    depth: 1
+    clone: true
+    update: true
+  register: clone_or_pull
+
+- name: "install netdata"
+  command: "./netdata-installer.sh --install {{ netdata_install_dir }} --dont-wait"
+  args:
+    chdir: "{{ netdata_install_dir }}"
+  when: clone_or_pull.changed | bool
+
+# - name: "Copy service file"
+#   copy:
+#     src: "{{ netdata_install_dir }}/system/netdata.service"
+#     dest: "/etc/systemd/system/netdata.service"
+#     remote_src: true
+#   when: clone_or_pull.changed | bool
+#   notify: start netdata

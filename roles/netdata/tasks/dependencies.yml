@@ -1,0 +1,26 @@
+---
+
+- name: "install netdata dependencies"
+  yum:
+    name:
+      - autoconf
+      - automake
+      - gcc
+      - gcc-c++
+      - git
+      - libtool
+      - make
+      - cmake
+      - nasm
+      - pkgconfig
+      - zlib-devel
+      - libuv-devel
+      - libuuid-devel
+      - openssl
+      - json-c-devel
+    state: present
+    update_cache: true
+
+- name: "install python library dependency for netdata"
+  pip:
+    name: passlib

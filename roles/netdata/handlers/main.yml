@@ -1,0 +1,14 @@
+---
+
+- name: "start netdata"
+  systemd:
+    name: netdata
+    state: started
+    enabled: true
+    daemon_reload: true
+
+- name: "restart nginx for netdata"
+  systemd:
+    name: nginx
+    state: restarted
+    enabled: true

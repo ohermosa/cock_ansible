@@ -14,18 +14,7 @@
       hostname: "{{ os_instance_name }}"
       group: mis_huevos
 
-- block:
-    - name: "get openstack instances info"
-      os_server_info:
-      register: os_response
-
-    - name: "set instance IP"
-      set_fact:
-        my_instance_ip: "{{ item.addresses.cop_network[1].addr }}"
-      when: item.name == os_instance_name
-      loop: "{{ os_response.openstack_servers }}"
-      loop_control:
-        label: "{{ item.name }}"
+- import_tasks: get_ip.yml
   when: not destroy
   tags:
     - check

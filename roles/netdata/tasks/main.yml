@@ -1,0 +1,16 @@
+---
+
+- import_tasks: dependencies.yml
+  tags:
+    - netdata
+    - netdata_dependencies
+
+- import_tasks: install.yml
+  tags:
+    - netdata
+    - netdata_install
+
+- import_tasks: nginx.yml
+  tags:
+    - netdata
+    - netdata_nginx
