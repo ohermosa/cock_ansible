@@ -17,6 +17,7 @@
       - libuv-devel
       - libuuid-devel
       - openssl
+      - openssl-devel
       - json-c-devel
     state: present
     update_cache: true

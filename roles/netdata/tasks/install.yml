@@ -15,15 +15,7 @@
   register: clone_or_pull
 
 - name: "install netdata"
-  command: "./netdata-installer.sh --install {{ netdata_install_dir }} --dont-wait"
+  command: "./netdata-installer.sh --dont-wait"
   args:
     chdir: "{{ netdata_install_dir }}"
   when: clone_or_pull.changed | bool
-
-# - name: "Copy service file"
-#   copy:
-#     src: "{{ netdata_install_dir }}/system/netdata.service"
-#     dest: "/etc/systemd/system/netdata.service"
-#     remote_src: true
-#   when: clone_or_pull.changed | bool
-#   notify: start netdata
